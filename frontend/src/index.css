@@ -17,3 +17,26 @@ header a{
   font-weight: bold;
   text-decoration: none; /* Tắt gạch chân thẻ a */
 }
+
+main{
+  padding: 1rem;
+}
+
+.products {
+  display: flex;
+}
+
+.product{
+  border: 1px #404040 solid;
+  margin: 1rem;
+  justify-content: center;
+}
+
+.product img{
+  width: 100%;
+  max-width:400px;
+}
+
+.product-info{
+  padding:1rem;
+}
