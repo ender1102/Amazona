@@ -7,7 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-header{
+/* header{
   background-color: #404040;
   padding: 1rem;
 }
@@ -15,11 +15,16 @@ header{
 header a{
   color:white;
   font-weight: bold;
-  text-decoration: none; /* Tắt gạch chân thẻ a */
+  text-decoration: none; /* Tắt gạch chân thẻ a
+} 
+*/
+
+.site-container{
+  min-height: 100vh;
 }
 
 main{
-  padding: 1rem;
+  flex:1;
 }
 
 .products {
