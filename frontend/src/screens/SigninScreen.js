@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form'
 import { Helmet } from 'react-helmet-async'
 import { Link, useLocation } from 'react-router-dom'
 
-export default function SigninScreen() {
+export default function SignInScreen() {
     const { search } = useLocation()
     const redirectInUrl = new URLSearchParams(search).get('redirect')
     const redirect = redirectInUrl ? redirectInUrl : '/'
