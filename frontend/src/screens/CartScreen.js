@@ -8,7 +8,7 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
 import MessageBox from '../components/MessageBox'
 import Card from 'react-bootstrap/Card'
-import axios from 'axios';
+import Axios from 'axios';
 
 
 
@@ -18,7 +18,7 @@ export default function CartScreen() {
   const { cart: { cartItems } } = state
 
   const updateCartHandler = async (item, quantity) => {
-    const { data } = await axios.get(`/api/products/${item._id}`)
+    const { data } = await Axios.get(`/api/products/${item._id}`)
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock')
       return
