@@ -13,6 +13,7 @@ import Badge from 'react-bootstrap/esm/Badge'
 import { Store } from './Store'
 import CartScreen from './screens/CartScreen'
 import SignInScreen from './screens/SignInScreen'
+import ShippingAddressScreen from './screens/ShippingAddressScreen'
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -21,6 +22,7 @@ function App() {
   const signoutHandler = () => {
     ctxDispatch({ type: 'USER_SIGNOUT' })
     localStorage.removeItem('userInfo')
+    localStorage.removeItem('shippingAddress')
   }
 
   return (
@@ -72,6 +74,7 @@ function App() {
               <Route path="/product/:slug" element={<ProductScreen />} />
               <Route path="/cart" element={<CartScreen />} />
               <Route path="/signin" element={<SignInScreen />} />
+              <Route path="/shipping" element={<ShippingAddressScreen />} />
             </Routes>
           </Container>
         </main>
