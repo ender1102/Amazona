@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form'
 import Axios from 'axios'
 import { Helmet } from 'react-helmet-async'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Store } from '../Store'
+import { Store } from './../Store'
 import { toast } from 'react-toastify'
 import { getError } from '../utils'
 
@@ -68,4 +68,3 @@ export default function SignInScreen() {
         </Container>
     )
 } 
-/* Fix 2 */
