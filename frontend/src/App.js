@@ -25,6 +25,9 @@ import { getError } from './utils'
 import Axios from 'axios'
 import SearchBox from './components/SearchBox'
 import SearchScreen from './screens/SearchScreen'
+import ProtectedRoute from './components/ProtectedRoute'
+import DashboardScreen from './screens/DashboardScreen'
+import AdminRoute from './components/AdminRoute'
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -68,7 +71,7 @@ function App() {
               </LinkContainer>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
-                <SearchBox/>
+                <SearchBox />
                 <Nav className="me-auto w-100 justify-content-end">
                   <Link to="/cart" className="nav-link">
                     Cart
@@ -96,6 +99,22 @@ function App() {
                       Sign In
                     </Link>
                   )}
+                  {userInfo && userInfo.isAdmin && (
+                    <NavDropdown title="Admin" id="admin-nav-dropdown">
+                      <LinkContainer to="/admin/dashboard">
+                        <NavDropdown.Item>Dashboard</NavDropdown.Item>
+                      </LinkContainer>
+                      <LinkContainer to="/admin/productlist">
+                        <NavDropdown.Item>Products</NavDropdown.Item>
+                      </LinkContainer>
+                      <LinkContainer to="/admin/orderlist">
+                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                      </LinkContainer>
+                      <LinkContainer to="/admin/userlist">
+                        <NavDropdown.Item>Users</NavDropdown.Item>
+                      </LinkContainer>
+                    </NavDropdown>
+                  )}
                 </Nav>
               </Navbar.Collapse>
             </Container>
@@ -104,7 +123,7 @@ function App() {
 
         <div
           className={sidebarIsOpen ? 'active-nav side-navbar d-flex justify-content-between flex-wrap flex-column'
-              : 'side-navbar d-flex justify-content-between flex-wrap flex-column'}>
+            : 'side-navbar d-flex justify-content-between flex-wrap flex-column'}>
           <Nav className="flex-column text-white w-100 p-2">
             <Nav.Item>
               <strong>Categories</strong>
@@ -131,12 +150,31 @@ function App() {
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/signin" element={<SignInScreen />} />
               <Route path="/signup" element={<SignUpScreen />} />
-              <Route path="/profile" element={<ProfileScreen />} />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfileScreen />
+                </ProtectedRoute>
+              } />
               <Route path="/shipping" element={<ShippingAddressScreen />} />
               <Route path="/payment" element={<PaymentMethodScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />
-              <Route path="/order/:id" element={<OrderScreen />} />
-              <Route path="/orderhistory" element={<OrderHistoryScreen />} />
+              <Route path="/order/:id" element={
+                <ProtectedRoute>
+                  <OrderScreen />
+                </ProtectedRoute>}
+              />
+              <Route path="/orderhistory" element={
+                <ProtectedRoute>
+                  <OrderHistoryScreen />
+                </ProtectedRoute>
+              } />
+              {/* Admin Routes */}
+              <Route path="/admin/dashboard" element={
+                <AdminRoute>
+                  <DashboardScreen />
+                </AdminRoute>
+              } />
+
             </Routes>
           </Container>
         </main>
