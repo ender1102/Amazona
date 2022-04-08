@@ -4,6 +4,7 @@
         "orderhistory",
         "placeorder",
         "signout",
-        "signup"
+        "signup",
+        "toprated"
     ]
 }
