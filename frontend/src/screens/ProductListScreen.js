@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Axios from 'axios'
 import React, { useContext, useEffect, useReducer } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
