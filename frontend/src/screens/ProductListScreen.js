@@ -108,7 +108,7 @@ export default function ProductListScreen() {
                 await Axios.delete(`/api/products/${product._id}`, {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 })
-                toast.success('product created successfully')
+                toast.success('product delete successfully')
                 dispatch({ type: 'DELETE_SUCCESS' })
 
             } catch (err) {
