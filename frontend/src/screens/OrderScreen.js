@@ -13,6 +13,7 @@ import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import ListGroupItem from 'react-bootstrap/esm/ListGroupItem';
 import { toast } from 'react-toastify';
+import Button from 'react-bootstrap/Button';
 
 function reducer(state, action) {
     switch (action.type) {
@@ -30,6 +31,14 @@ function reducer(state, action) {
             return { ...state, loadingPay: false }
         case 'PAY_RESET':
             return { ...state, loadingPay: false, successPay: false }
+        case 'DELIVER_REQUEST':
+            return { ...state, loadingDeliver: true }
+        case 'DELIVER_SUCCESS':
+            return { ...state, loadingDeliver: false, successDeliver: true }
+        case 'DELIVER_FAIL':
+            return { ...state, loadingDeliver: false }
+        case 'DELIVER_RESET':
+            return { ...state, loadingDeliver: false, successDeliver: false }
         default:
             return state
     }
@@ -43,7 +52,7 @@ export default function OrderScreen() {
     const { id: orderId } = params
     const navigate = useNavigate()
 
-    const [{ loading, error, order, successPay, loadingPay }, dispatch] = useReducer(reducer, {
+    const [{ loading, error, order, successPay, loadingPay, successDeliver, loadingDeliver }, dispatch] = useReducer(reducer, {
         loading: true,
         order: {},
         error: '',
@@ -85,7 +94,7 @@ export default function OrderScreen() {
         })
     }
 
-    function onError(err){
+    function onError(err) {
         toast.error(getError(err))
     }
 
@@ -104,10 +113,13 @@ export default function OrderScreen() {
         if (!userInfo) {
             return navigate('/login')
         }
-        if (!order._id || successPay || (order._id && order._id !== orderId)) {
+        if (!order._id || successPay || successDeliver || (order._id && order._id !== orderId)) {
             fetchOrder()
             if (successPay) {
-                dispatch({ type: 'PAY_RESET'})
+                dispatch({ type: 'PAY_RESET' })
+            }
+            if (successDeliver) {
+                dispatch({ type: 'DELIVER_RESET' })
             }
         } else {
             const loadPaypalScript = async () => {
@@ -125,7 +137,20 @@ export default function OrderScreen() {
             }
             loadPaypalScript()
         }
-    }, [order, userInfo, orderId, navigate, paypalDispatch, successPay])
+    }, [order, userInfo, orderId, navigate, paypalDispatch, successPay, successDeliver])
+
+    async function deliverOrderHandler() {
+        try {
+            dispatch({ type: 'DELIVER_REQUEST' })
+            const { data } = await Axios.put(`/api/orders/${order._id}/deliver`, {}, {
+                headers: { authorization: `Bearer ${userInfo.token}` }
+            })
+            dispatch({ type: 'DELIVER_SUCCESS', payload: data })
+        } catch (err) {
+            toast.error(getError(err))
+            dispatch({ type: 'DELIVER_FAIL' })
+        }
+    }
 
     return loading ? (<LoadingBox></LoadingBox>
     ) : error ?
@@ -226,7 +251,17 @@ export default function OrderScreen() {
                                                     <PayPalButtons createOrder={createOrder} onApprove={onApprove} onError={onError}></PayPalButtons>
                                                 </div>
                                             )}
-                                            {loadingPay && <LoadingBox/>}
+                                            {loadingPay && <LoadingBox />}
+                                        </ListGroupItem>
+                                    )}
+                                    {userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                                        <ListGroupItem>
+                                            {loadingDeliver && <LoadingBox />}
+                                            <div className="d-grid">
+                                                <Button type="button" onClick={deliverOrderHandler}>
+                                                    Deliver Order
+                                                </Button>
+                                            </div>
                                         </ListGroupItem>
                                     )}
                                 </ListGroup>
