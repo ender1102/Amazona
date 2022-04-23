@@ -9,7 +9,7 @@ import CheckoutSteps from '../components/CheckoutSteps'
 export default function ShippingAddressScreen() {
   const navigate = useNavigate()
   const { state, dispatch: ctxDispatch } = useContext(Store)
-  const { userInfo, cart: { shippingAddress } } = state
+  const { fullBox, userInfo, cart: { shippingAddress } } = state
 
   const [fullName, setFullName] = useState(shippingAddress.fullName || '')
   const [address, setAddress] = useState(shippingAddress.address || '')
@@ -17,8 +17,8 @@ export default function ShippingAddressScreen() {
   const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '')
   const [country, setCountry] = useState(shippingAddress.country || '')
 
-  useEffect(()=>{
-    if(!userInfo){
+  useEffect(() => {
+    if (!userInfo) {
       navigate('/signin?redirect=/shipping')
     }
   }, [userInfo, navigate])
@@ -32,7 +32,8 @@ export default function ShippingAddressScreen() {
         address,
         city,
         postalCode,
-        country
+        country,
+        location: shippingAddress.location,
       }
     })
     localStorage.setItem(
@@ -42,11 +43,16 @@ export default function ShippingAddressScreen() {
         address,
         city,
         postalCode,
-        country
+        country,
+        location: shippingAddress.location,
       })
     )
     navigate('/payment')
   }
+
+  useEffect(() => {
+    ctxDispatch({ type: 'SET_FULLBOX_OFF' })
+  }, [ctxDispatch, fullBox])
 
   return (
     <div>
@@ -83,6 +89,19 @@ export default function ShippingAddressScreen() {
             <Form.Control value={country} onChange={(e) => setCountry(e.target.value)} required>
             </Form.Control>
           </Form.Group>
+          <div className="mb-3">
+            <Button id="chooseOnMap" type="button" variant="light" onClick={() => navigate('/map')}>
+              Choose Location On Map
+            </Button>
+            {shippingAddress.location && shippingAddress.location.lat ?
+              <div>
+                LAT: {shippingAddress.location.lat}
+                LNG: {shippingAddress.location.lng}
+              </div>
+              :
+              <div>No location</div>
+            }
+          </div>
           <div className="mb-3">
             <Button variant="primary" type="submit">
               Continue
