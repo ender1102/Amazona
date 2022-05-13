@@ -43,6 +43,7 @@ function ProductScreen() {
 
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
+  const [selectedImage, setSelectedImage] = useState('')
 
   const navigate = useNavigate()
   const params = useParams()
@@ -124,7 +125,7 @@ function ProductScreen() {
         <div>
           <Row>
             <Col md={6}>
-              <img src={product.image} className="card-img-top" alt={product.name} />
+              <img src={selectedImage || product.image} className="img-large" alt={product.name} />
             </Col>
             <Col md={3}>
               <ListGroup variant="flush">
@@ -132,6 +133,19 @@ function ProductScreen() {
                 <ListGroup.Item><h1>{product.name}</h1></ListGroup.Item>
                 <ListGroup.Item><Rating rating={product.rating} numReviews={product.numReviews} /></ListGroup.Item>
                 <ListGroup.Item>Price: {product.price} $</ListGroup.Item>
+                <ListGroup.Item>
+                  <Row xs={1} md={2} className="g-2">
+                    {[product.image, ...product.images].map((x) => (
+                      <Col key={x}>
+                        <Card>
+                          <Button className="thumbnail" type="button" variant="light" onClick={() => setSelectedImage(x)}>
+                            <Card.Img variant="top" src={x} alt="product" className="card-img__style"/>
+                          </Button>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                </ListGroup.Item>
                 <ListGroup.Item>Description: {product.description}</ListGroup.Item>
               </ListGroup>
             </Col>
@@ -195,7 +209,7 @@ function ProductScreen() {
               {userInfo ? (
                 <form onSubmit={submitHandler}>
                   <h2>Write a customer review</h2>
-                  <Form.Group classNam="mb-3" controlId="rating">
+                  <Form.Group className="mb-3" controlId="rating">
                     <Form.Label>Rating</Form.Label>
                     <Form.Select aria-label="Rating" value={rating} onChange={(e) => setRating(e.target.value)}>
                       <option value="">Select...</option>
@@ -203,11 +217,11 @@ function ProductScreen() {
                       <option value="2">2- Fair</option>
                       <option value="3">3- Good</option>
                       <option value="4">4- Very good</option>
-                      <option value="5">5- Excelent</option>
+                      <option value="5">5- Excellent</option>
                     </Form.Select>
                   </Form.Group>
                   <FloatingLabel controlId="floatingTextarea" label="Comments" className="mb-3">
-                    <Form.Control as="textarea" placeholder="Leave a comment here" value={comment} onChange={(e) => setComment(e.target.value)}/>
+                    <Form.Control as="textarea" placeholder="Leave a comment here" value={comment} onChange={(e) => setComment(e.target.value)} />
                   </FloatingLabel>
                   <div className="mb-3">
                     <Button disabled={loadingCreateReview} type="submit">

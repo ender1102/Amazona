@@ -10,6 +10,7 @@ import MessageBox from '../components/MessageBox'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import { toast } from 'react-toastify'
+import ListGroup from 'react-bootstrap/ListGroup'
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -26,9 +27,9 @@ const reducer = (state, action) => {
         case 'UPDATE_FAIL':
             return { ...state, loadingUpdate: false, error: action.payload }
         case 'UPLOAD_REQUEST':
-            return { ...state, loadingUpload: true, errorUpload:'' }
+            return { ...state, loadingUpload: true, errorUpload: '' }
         case 'UPLOAD_SUCCESS':
-            return { ...state, loadingUpload: false, errorUpload:'' }
+            return { ...state, loadingUpload: false, errorUpload: '' }
         case 'UPLOAD_FAIL':
             return { ...state, loadingUpload: false, errorUpload: action.payload }
         default:
@@ -51,6 +52,7 @@ export default function ProductEditScreen() {
     const [slug, setSlug] = useState('')
     const [price, setPrice] = useState('')
     const [image, setImage] = useState('')
+    const [images, setImages] = useState([])
     const [category, setCategory] = useState('')
     const [countInStock, setCountInStock] = useState('')
     const [brand, setBrand] = useState('')
@@ -65,6 +67,7 @@ export default function ProductEditScreen() {
                 setSlug(data.slug)
                 setPrice(data.price)
                 setImage(data.image)
+                setImages(data.images)
                 setCategory(data.category)
                 setCountInStock(data.countInStock)
                 setBrand(data.brand)
@@ -77,52 +80,62 @@ export default function ProductEditScreen() {
         fetchData()
     }, [productId])
 
-    const submitHandler = async(e) => {
+    const submitHandler = async (e) => {
         e.preventDefault()
         try {
-            dispatch({type: 'UPDATE_REQUEST'})
+            dispatch({ type: 'UPDATE_REQUEST' })
             await Axios.put(`/api/products/${productId}`, {
-                _id:productId,
+                _id: productId,
                 name,
                 slug,
                 price,
                 image,
+                images,
                 category,
                 brand,
                 countInStock,
                 description,
             }, {
-                headers:{Authorization: `Bearer ${userInfo.token}`}
+                headers: { Authorization: `Bearer ${userInfo.token}` }
             })
-            dispatch({type: 'UPDATE_SUCCESS'})
+            dispatch({ type: 'UPDATE_SUCCESS' })
             toast.success('Product updated successfully')
             navigate('/admin/products')
         } catch (err) {
             toast.error(getError(err))
-            dispatch({type: 'UPDATE_FAIL'})
+            dispatch({ type: 'UPDATE_FAIL' })
         }
     }
 
-    const uploadFileHandler = async (e) => {
+    const uploadFileHandler = async (e, forImages) => {
         const file = e.target.files[0]
         const bodyFormData = new FormData()
         bodyFormData.append('file', file)
         try {
             dispatch({ type: 'UPLOAD_REQUEST' })
-            const {data} = await Axios.post('/api/upload', bodyFormData, {
-                headers:{
-                    'Content-Type' : 'multipart/form-data',
+            const { data } = await Axios.post('/api/upload', bodyFormData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
                     authorization: `Bearer ${userInfo.token}`
                 }
             })
             dispatch({ type: 'UPLOAD_SUCCESS' })
-            toast.success('Image uploaded successfully')
-            setImage(data.secure_url)
+            if (forImages) {
+                setImages([...images, data.secure_url])
+            } else {
+                setImage(data.secure_url)
+            }
+            toast.success('Image uploaded successfully. click Update to apply it')
         } catch (err) {
             toast.error(getError(err))
             dispatch({ type: 'UPLOAD_FAIL' })
-            
+
         }
+    }
+
+    const deleteFileHandler = async (fileName) => {
+        setImages(images.filter((x) => x === fileName))
+        toast.success('Image removed successfully. click Update to apply it')
     }
 
     return (
@@ -152,8 +165,27 @@ export default function ProductEditScreen() {
                             <Form.Control value={image} onChange={(e) => setImage(e.target.value)} required />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="imageFile">
-                            <Form.Label>Upload File</Form.Label>
-                            <Form.Control type="file" onChange={uploadFileHandler}/>
+                            <Form.Label>Upload Image</Form.Label>
+                            <Form.Control type="file" onChange={uploadFileHandler} />
+                            {loadingUpload && <LoadingBox></LoadingBox>}
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="additionalImage">
+                            <Form.Label>Additional Image</Form.Label>
+                            {images.length === 0 && <MessageBox>No Image</MessageBox>}
+                            <ListGroup variant="flush">
+                                {images.map((x) => (
+                                    <ListGroup.Item key={x}>
+                                        {x}
+                                        <Button variant="light" onClick={(x) => deleteFileHandler(x)}>
+                                            <i className="fa fa-times-circle"></i>
+                                        </Button>
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="additionalImageFile">
+                            <Form.Label>Upload Additional Image</Form.Label>
+                            <Form.Control type="file" onChange={(e) => uploadFileHandler(e, true)} />
                             {loadingUpload && <LoadingBox></LoadingBox>}
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="category">
