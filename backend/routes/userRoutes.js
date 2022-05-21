@@ -103,8 +103,8 @@ userRouter.put(
                 isAdmin: updateUser.isAdmin,
                 token: generateToken(updateUser),
             })
-        } else {
-            res.status(404).send({ message: 'User not found' })
+        }else{
+            res.status(404).send({message:'User not found'})
         }
     })
 )

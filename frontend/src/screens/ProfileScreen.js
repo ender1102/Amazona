@@ -36,21 +36,25 @@ export default function ProfileScreen() {
 
     const submitHandler = async (e) => {
         e.preventDefault()
-        try {
-            const { data } = await Axios.put('/api/users/profile', {
-                name,
-                email,
-                password,
-            }, {
-                headers: { Authorization: `Bearer ${userInfo.token}` }
-            })
-            dispatch({ type: 'UPDATE_SUCCESS' })
-            ctxDispatch({ type: 'USER_SIGNIN', payload: data })
-            localStorage.setItem('userInfo', JSON.stringify(data))
-            toast.success('User updated successfully')
-        } catch (err) {
-            dispatch({ type: 'FETCH_FAIL', })
-            toast.error(getError(err))
+        if (confirmPassword === password) {
+            try {
+                const { data } = await Axios.put("/api/users/profile", {
+                    name,
+                    email,
+                    password,
+                }, {
+                    headers: { Authorization: `Bearer ${userInfo.token}` }
+                })
+                dispatch({ type: 'UPDATE_SUCCESS' })
+                ctxDispatch({ type: 'USER_SIGNIN', payload: data })
+                localStorage.setItem('userInfo', JSON.stringify(data))
+                toast.success('User updated successfully')
+            } catch (err) {
+                dispatch({ type: 'FETCH_FAIL', })
+                toast.error(getError(err))
+            }
+        }else{
+            toast.error("Confirm password does not match")
         }
     }
 
@@ -62,16 +66,16 @@ export default function ProfileScreen() {
             <h1 className="my-3">User Profile</h1>
             <form onSubmit={submitHandler}>
                 <Form.Group className="mb-3" controlId="name">
-                    <Form.Control value={name} onChange={(e) => setName(e.target.value)} required />
+                    <Form.Control value={name} onChange={(e) => setName(e.target.value)} required placeholder="Name"/>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="name">
-                    <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="password">
-                    <Form.Control value={password} type="password" onChange={(e) => setPassword(e.target.value)} required />
+                <Form.Group className="mb-3" controlId="email">
+                    <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Email"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="password">
-                    <Form.Control value={confirmPassword} type="password" onChange={(e) => setConfirmPassword(e.target.value)} required />
+                    <Form.Control value={password} type="password" onChange={(e) => setPassword(e.target.value)} required placeholder="Password"/>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="password">
+                    <Form.Control value={confirmPassword} type="password" onChange={(e) => setConfirmPassword(e.target.value)} required placeholder="Confirm Password"/>
                 </Form.Group>
                 <div className="mb-3">
                     <Button type="submit">Update</Button>
